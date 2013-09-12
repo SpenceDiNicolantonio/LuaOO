@@ -18,7 +18,7 @@ end
 --
 local function isClass(class)
 	return class
-		and class.Extends
+		and class.Extends ~= nil
 		and class:Extends(Object);
 end;
 
@@ -185,9 +185,13 @@ local function createClass(name, super)
 	-- Determines a given object is an instance of the class
 	--
 	function members.static.final:IsInstance(object)
-		return object
-			and object.GetClass
-			and (object:GetClass() == self);
+		-- Verify input
+		if ((object == nil) or (object.GetClass == nil)) then
+			return false;
+		end
+
+		local class = object:GetClass();
+		return (class == self) or (class:Extends(self));
 	end
 
 	---
@@ -272,8 +276,12 @@ local function createClass(name, super)
 	-- class or is a superclass of this class
 	--
 	function members.static.final:Extends(class)
-		return (self == class)
-			or (self:Parent() and self:Parent():Extends(class));
+		if (self == class) then
+			return true
+		end;
+
+		local parent = self:Parent();
+		return (parent ~= nil) and self:Parent():Extends(class);
 	end
 
 	---
