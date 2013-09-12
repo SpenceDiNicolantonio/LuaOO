@@ -35,6 +35,38 @@ describe("Extension", function()
 	end)
 
 
+	it("should inherit public methods", function()
+		function Point1D:ToString() return "a point" end
+		assert.equals(p1:ToString(), "a point");
+		assert.equals(p2:ToString(), "a point");
+		assert.equals(p3:ToString(), "a point");
+	end)
+
+
+	it ("should inherit public final methods", function()
+		function Point1D.final:ToString() return "a point" end
+		assert.equals(p1:ToString(), "a point");
+		assert.equals(p2:ToString(), "a point");
+		assert.equals(p3:ToString(), "a point");
+	end)
+
+
+	it("should inherit static methods", function()
+		function Point1D.static:ToString() return "a point" end
+		assert.equals(Point1D:ToString(), "a point");
+		assert.equals(Point2D:ToString(), "a point");
+		assert.equals(Point3D:ToString(), "a point");
+	end)
+
+
+	it ("should inherit static final methods", function()
+		function Point1D.static.final:ToString() return "a point" end
+		assert.equals(Point1D:ToString(), "a point");
+		assert.equals(Point2D:ToString(), "a point");
+		assert.equals(Point3D:ToString(), "a point");
+	end)
+
+
 	it("should allow overriding of public methods", function()
 		function Point1D:ToString() return ("("..self.x..")"); end
 		function Point2D:ToString() return ("("..self.x..", "..self.y..")"); end
