@@ -3,7 +3,7 @@ require("LuaOO")
 describe("Base Class", function()
 
 	it("cannot be instantiated", function()
-		assert.has.error(function()
+		assert.error(function()
 			Object:New();
 		end)
 	end)
@@ -15,13 +15,13 @@ describe("Base Class", function()
 
 
 	it("requires a class name for extension", function()
-		assert.has.error(function()
+		assert.error(function()
 			Object:Extend();
 		end)
-		assert.has.error(function()
+		assert.error(function()
 			Object:Extend(2);
 		end)
-		assert.has.error(function()
+		assert.error(function()
 			Object:Extend(function() end);
 		end)
 	end)
@@ -41,7 +41,9 @@ describe("Base Class", function()
 		local MyClass = Object:Extend("MyClass");
 		assert.False(Object:Extends(MyClass));
 		assert.False(Object:Extends(Object));
-		assert.False(Object:Extends(nil));
+		assert.error(function()
+			Object:Extends(nil)
+		end);
 	end)
 
 
@@ -54,45 +56,45 @@ describe("Base Class", function()
 
 
 	it("does not allow definition of public fields", function()
-		assert.has.error(function()
+		assert.error(function()
 			Object.someField = "value";
 		end)
-		assert.has.error(function()
+		assert.error(function()
 			Object.final.someField = "value";
 		end)
 	end)
 
 
 	it("does not allow definition of public methods", function()
-		assert.has.error(function()
+		assert.error(function()
 			function Object:SomeMethod() end
 		end)
 	end)
 
 
 	it("does not allow definition of static fields", function()
-		assert.has.error(function()
+		assert.error(function()
 			Object.static.someField = "value";
 		end)
 	end)
 
 
 	it("does not allow definition of static methods", function()
-		assert.has.error(function()
+		assert.error(function()
 			function Object.static:SomeStaticMethod() end
 		end)
 	end)
 
 
 	it("does not allow definition of public final methods", function()
-		assert.has.error(function()
+		assert.error(function()
 			function Object.final:SomeFinalMethod() end
 		end)
 	end)
 
 
 	it("does not allow definition of static final methods", function()
-		assert.has.error(function()
+		assert.error(function()
 			function Object.static.final:SomeStaticFinalMethod() end
 		end)
 	end)

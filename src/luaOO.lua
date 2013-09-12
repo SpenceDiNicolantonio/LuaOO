@@ -277,6 +277,8 @@ local function createClass(name, super)
 	-- class or is a superclass of this class
 	--
 	function members.static.final:Extends(class)
+		assert(class ~= nil, "Expected class, found nil.");
+
 		local parent = self:Parent();
 		return (parent ~= nil) and ((parent == class) or parent:Extends(class));
 	end

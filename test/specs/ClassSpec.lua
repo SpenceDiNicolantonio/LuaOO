@@ -22,13 +22,13 @@ describe("Class", function()
 
 
 	it("requires a class name for extension", function()
-		assert.has.error(function()
+		assert.error(function()
 			MyClass:Extend();
 		end)
-		assert.has.error(function()
+		assert.error(function()
 			MyClass:Extend(2);
 		end)
-		assert.has.error(function()
+		assert.error(function()
 			MyClass:Extend(function() end);
 		end)
 	end)
@@ -43,8 +43,8 @@ describe("Class", function()
 
 	it("can report its superclass", function()
 		local MySubclass = MyClass:Extend("MySubclass");
-		assert.same(MyClass:Parent(), Object);
-		assert.same(MySubclass:Parent(), MyClass);
+		assert.equal(MyClass:Parent(), Object);
+		assert.equal(MySubclass:Parent(), MyClass);
 	end)
 
 
@@ -69,10 +69,10 @@ describe("Class", function()
 
 
 	it("does not allow definition of public fields", function()
-		assert.has.error(function()
+		assert.error(function()
 			MyClass.someField = "value";
 		end);
-		assert.has.error(function()
+		assert.error(function()
 			MyClass.final.someField = "value";
 		end);
 	end)
