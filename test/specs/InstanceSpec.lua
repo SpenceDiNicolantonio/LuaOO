@@ -33,4 +33,40 @@ describe("Instance", function()
 		end);
 	end)
 
+
+	it("can call public methods", function()
+		function MyClass:SomeMethod()
+			return "public";
+		end
+		assert.equal(instance:SomeMethod(), "public");
+	end)
+
+
+	it("can call public final methods", function()
+		function MyClass.final:SomeMethod()
+			return "final";
+		end
+		assert.equal(instance:SomeMethod(), "final");
+	end)
+
+
+	it("cannot call static methods", function()
+		function MyClass.static:SomeStaticMethod()
+			return "static";
+		end
+		assert.error(function()
+			instance:SomeStaticMethod();
+		end);
+	end)
+
+
+	it("cannot call static final methods", function()
+		function MyClass.static:SomeStaticFinalMethod()
+			return "static final";
+		end
+		assert.error(function()
+			instance:SomeStaticMethod();
+		end);
+	end)
+
 end)
