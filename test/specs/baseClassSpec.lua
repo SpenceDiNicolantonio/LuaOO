@@ -53,7 +53,7 @@ describe("Base Class", function()
 	end)
 
 
-	it("cannot define public fields", function()
+	it("does not allow definition of public fields", function()
 		assert.has.error(function()
 			Object.someField = "value";
 		end)
@@ -63,35 +63,35 @@ describe("Base Class", function()
 	end)
 
 
-	it("cannot define public methods", function()
+	it("does not allow definition of public methods", function()
 		assert.has.error(function()
 			function Object:SomeMethod() end
 		end)
 	end)
 
 
-	it("cannot define static fields", function()
+	it("does not allow definition of static fields", function()
 		assert.has.error(function()
 			Object.static.someField = "value";
 		end)
 	end)
 
 
-	it("cannot define static methods", function()
+	it("does not allow definition of static methods", function()
 		assert.has.error(function()
 			function Object.static:SomeStaticMethod() end
 		end)
 	end)
 
 
-	it("cannot define public final methods", function()
+	it("does not allow definition of public final methods", function()
 		assert.has.error(function()
 			function Object.final:SomeFinalMethod() end
 		end)
 	end)
 
 
-	it("cannot define static final methods", function()
+	it("does not allow definition of static final methods", function()
 		assert.has.error(function()
 			function Object.static.final:SomeStaticFinalMethod() end
 		end)
