@@ -21,7 +21,7 @@ describe("Class", function()
 	end)
 
 
-	it("cannot be extended without class name", function()
+	it("requires a class name for extension", function()
 		assert.has.error(function()
 			MyClass:Extend();
 		end)
@@ -54,10 +54,11 @@ describe("Class", function()
 		assert.True(MySubclass:Extends(MyClass));
 		assert.True(MySubclass:Extends(Object));
 		assert.False(MyClass:Extends(MySubclass));
+		assert.False(MyClass:Extends(MyClass));
 	end)
 
 
-	it("can determine if an object is an instance of itself", function()
+	it("can determine if an object is an instance of it", function()
 		local MyOtherClass = Object:Extend("MyOtherClass");
 		local instance = MyClass:New();
 		assert.True(MyClass:IsInstance(instance));
@@ -67,7 +68,7 @@ describe("Class", function()
 	end)
 
 
-	it("cannot have public fields", function()
+	it("cannot define public fields", function()
 		assert.has.error(function()
 			MyClass.someField = "value";
 		end);
@@ -77,27 +78,27 @@ describe("Class", function()
 	end)
 
 
-	it("can have public methods", function()
+	it("can define public methods", function()
 		function MyClass:SomeMethod() end
 	end)
 
 
-	it("can have static fields", function()
+	it("can define static fields", function()
 		Object.static.someField = "value";
 	end)
 
 
-	it("can have static methods", function()
+	it("can define static methods", function()
 		function Object.static:SomeStaticMethod() end
 	end)
 
 
-	it("can have public final methods", function()
+	it("can define public final methods", function()
 		function Object.final:SomeFinalMethod() end
 	end)
 
 
-	it("can have static final methods", function()
+	it("can define static final methods", function()
 		function Object.static.final:SomeStaticFinalMethod() end
 	end)
 
