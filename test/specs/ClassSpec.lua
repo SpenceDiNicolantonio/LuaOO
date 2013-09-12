@@ -35,7 +35,7 @@ describe("Class", function()
 
 
 	it("can report its name", function()
-		local MySubclass = Object:Extend("MySubclass");
+		local MySubclass = MyClass:Extend("MySubclass");
 		assert.equals(MyClass:GetName(), "MyClass");
 		assert.equals(MySubclass:GetName(), "MySubclass");
 	end)
@@ -84,22 +84,50 @@ describe("Class", function()
 
 
 	it("allows definition of static fields", function()
-		Object.static.someField = "value";
+		MyClass.static.someField = "value";
 	end)
 
 
 	it("allows definition of static methods", function()
-		function Object.static:SomeStaticMethod() end
+		function MyClass.static:SomeStaticMethod() end
 	end)
 
 
 	it("allows definition of public final methods", function()
-		function Object.final:SomeFinalMethod() end
+		function MyClass.final:SomeFinalMethod() end
 	end)
 
 
 	it("allows definition of static final methods", function()
-		function Object.static.final:SomeStaticFinalMethod() end
+		function MyClass.static.final:SomeStaticFinalMethod() end
+	end)
+
+
+	it("cannot call public methods", function()
+		function MyClass:SomeMethod() return "public"; end
+		assert.error(function()
+			MyClass:SomeMethod();
+		end)
+	end)
+
+
+	it("cannot call public final methods", function()
+		function MyClass.final:SomeFinalMethod() return "final"; end
+		assert.error(function()
+			MyClass:SomeFinalMethod();
+		end)
+	end)
+
+
+	it("can call static methods", function()
+		function MyClass.static:SomeStaticMethod() return "static"; end
+		assert.equals(MyClass:SomeStaticMethod(), "static");
+	end)
+
+
+	it("can call static final methods", function()
+		function MyClass.static:SomeStaticFinalMethod() return "static final"; end
+		assert.equals(MyClass:SomeStaticFinalMethod(), "static final");
 	end)
 
 end)
