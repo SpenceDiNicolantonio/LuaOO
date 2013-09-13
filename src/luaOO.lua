@@ -158,9 +158,11 @@ local function createClass(name, super)
 	});
 
 
-	---============ Standard Methods ==============---
-	-- The class' metatable is set to route static
-	-- member access and method calls as needed.
+	---============= Default Methods ===============---
+	--- These methods must be definied per class rather
+	--- than be inherited. This is typically because
+	--- they facility the inheritence, or rely on
+	--- closure variables (up values).
 	---=============================================---
 
 	---
@@ -171,38 +173,25 @@ local function createClass(name, super)
 	end
 
 	---
-	-- Default ToString
-	--
-	function members:ToString()
-		return tostring(self);
-	end
-
-	---
 	-- Returns the object's class
 	--
 	function members.final:GetClass()
 		return class;
 	end
 
+
 	---
-	-- Determines if the object is an instance of the given class
+	-- Returns the class' name
 	--
-	function members.final:InstanceOf(class)
-		assert(isClass(class), "Invalid class. Expected class object.");
-		return class:IsInstance(self);
+	function members.static.final:GetName()
+		return name;
 	end
 
 	---
-	-- Determines a given object is an instance of the class
+	-- Returns the class' superclass
 	--
-	function members.static.final:IsInstance(object)
-		-- Verify input
-		if ((object == nil) or (object.GetClass == nil)) then
-			return false;
-		end
-
-		local class = object:GetClass();
-		return (class == self) or (class:Extends(self));
+	function members.static.final:Parent()
+		return super;
 	end
 
 	---
@@ -261,25 +250,81 @@ local function createClass(name, super)
 		return nil;
 	end
 
+
+	---============ Base Class Methods =============---
+	-- Defined only on the base class and thus
+	-- inherited by all classes.
+	---=============================================---
+
+	-- Return here if not the base class
+	if (super ~= nil) then
+		return class;
+	end
+
+
+	---
+	-- Default ToString
+	--
+	function members:ToString()
+		return tostring(self);
+	end
+
+	---
+	-- Determines if the object is an instance of the given class
+	--
+	function members.final:InstanceOf(class)
+		assert(isClass(class), "Invalid class. Expected class object.");
+		return class:IsInstance(self);
+	end
+
+	---
+	-- Calls a given superclass method.
+	-- We need to keep track of depth (via closure variable),
+	-- as any call to self:Super() in the called method will
+	-- be made on the same instance and thus point at the
+	-- instsance's parent class rather than its parent class'
+	-- parent class.
+	--
+	local depth = 1;
+	function members.final:Super(methodName, ...)
+		-- Determine which constructor to call
+		local superTarget = self;
+		for i=1, depth do
+			superTarget = superTarget:Parent();
+		end
+
+		-- Increment depth so if the super-constructor contains
+		-- a call to self:Super(), we don't get stuck in an infinite loop
+		depth = depth + 1;
+
+		-- Call method
+		local returnValues = {superTarget:FindMethod(methodName)(self, ...)};
+
+		-- Decrement depth now that we're out of the super-constructor
+		depth = depth - 1;
+
+		-- Return results of method call
+		return unpack(returnValues);
+	end
+
+	---
+	-- Determines a given object is an instance of the class
+	--
+	function members.static.final:IsInstance(object)
+		-- Verify input
+		if ((object == nil) or (object.GetClass == nil)) then
+			return false;
+		end
+
+		local class = object:GetClass();
+		return (class == self) or (class:Extends(self));
+	end
+
 	---
 	-- Creates a subclass of the class
 	--
 	function members.static.final:Extend(name)
 		return createClass(name, self);
-	end
-
-	---
-	-- Returns the class' name
-	--
-	function members.static.final:GetName()
-		return name;
-	end
-
-	---
-	-- Returns the class' superclass
-	--
-	function members.static.final:Parent()
-		return super;
 	end
 
 	---
@@ -297,8 +342,10 @@ local function createClass(name, super)
 	-- Creates a new instance of the class
 	--
 	function members.static.final:New(...)
+		local class = self;
+
 		-- Verify not base class
-		assert(super ~= nil, "Cannot instantiate the Object class. Extend it!");
+		assert(class:Parent() ~= nil, "Cannot instantiate the Object class. Extend it!");
 
 		-- Create instance
 		local instance = setmetatable({}, {
@@ -322,37 +369,6 @@ local function createClass(name, super)
 
 		-- Return instance
 		return instance;
-	end
-
-	---
-	-- Calls a given superclass method.
-	-- We need to keep track of depth (via closure variable),
-	-- as any call to self:Super() in the called method will
-	-- be made on the same instance and thus point at the
-	-- instsance's parent class rather than its parent class'
-	-- parent class.
-	--
-	local depth = 1;
-	function members.final:Super(methodName, ...)
-
-		-- Determine which constructor to call
-		local superTarget = class;
-		for i=1, depth do
-			superTarget = superTarget:Parent();
-		end
-
-		-- Increment depth so if the super-constructor contains
-		-- a call to self:Super(), we don't get stuck in an infinite loop
-		depth = depth + 1;
-
-		-- Call method
-		local returnValues = {superTarget:FindMethod(methodName)(self, ...)};
-
-		-- Decrement depth now that we're out of the super-constructor
-		depth = depth - 1;
-
-		-- Return results of method call
-		return unpack(returnValues);
 	end
 
 
