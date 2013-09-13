@@ -214,6 +214,35 @@ local function createClass(name, super)
 		return class;
 	end
 
+	---
+	-- Calls a given superclass method.
+	-- We need to keep track of depth (via closure variable),
+	-- as any call to self:Super() in the called method will
+	-- be made on the same instance and thus point at the
+	-- instsance's parent class rather than its parent class'
+	-- parent class.
+	--
+	local depth = 1;
+	function members.final:Super(methodName, ...)
+		-- Determine which class to call method on
+		local superTarget = class;
+		for i=1, depth do
+			superTarget = superTarget:Parent();
+		end
+
+		-- Increment depth so if the superclass method contains
+		-- a call to self:Super(), we don't get stuck in an infinite loop
+		depth = depth + 1;
+
+		-- Call method
+		local returnValues = {superTarget:FindMethod(methodName)(self, ...)};
+
+		-- Decrement depth now that we're out of the superclass call
+		depth = depth - 1;
+
+		-- Return results of method call
+		return unpack(returnValues);
+	end
 
 	---
 	-- Returns the class' name
@@ -317,36 +346,6 @@ local function createClass(name, super)
 	function members.final:InstanceOf(class)
 		assert(isClass(class), "Invalid class. Expected class object.");
 		return class:IsInstance(self);
-	end
-
-	---
-	-- Calls a given superclass method.
-	-- We need to keep track of depth (via closure variable),
-	-- as any call to self:Super() in the called method will
-	-- be made on the same instance and thus point at the
-	-- instsance's parent class rather than its parent class'
-	-- parent class.
-	--
-	local depth = 1;
-	function members.final:Super(methodName, ...)
-		-- Determine which class to call method on
-		local superTarget = self;
-		for i=1, depth do
-			superTarget = superTarget:Parent();
-		end
-
-		-- Increment depth so if the superclass method contains
-		-- a call to self:Super(), we don't get stuck in an infinite loop
-		depth = depth + 1;
-
-		-- Call method
-		local returnValues = {superTarget:FindMethod(methodName)(self, ...)};
-
-		-- Decrement depth now that we're out of the superclass call
-		depth = depth - 1;
-
-		-- Return results of method call
-		return unpack(returnValues);
 	end
 
 	---

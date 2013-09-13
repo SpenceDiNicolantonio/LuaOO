@@ -126,7 +126,7 @@ describe("Class", function()
 
 
 	it("can call static final methods", function()
-		function MyClass.static:SomeStaticFinalMethod() return "static final"; end
+		function MyClass.static.final:SomeStaticFinalMethod() return "static final"; end
 		assert.equals(MyClass:SomeStaticFinalMethod(), "static final");
 	end)
 

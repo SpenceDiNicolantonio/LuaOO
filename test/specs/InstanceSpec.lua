@@ -69,4 +69,24 @@ describe("Instance", function()
 		end);
 	end)
 
+
+	it("can call superclass methods", function()
+		Greeter = Object:Extend("Greeter");
+		function Greeter:GetGreeting(name)
+			return ("Hello "..name);
+		end
+
+		SpanishGreeter = Greeter:Extend("SpanishGreeter");
+		function SpanishGreeter:GetGreeting(name)
+			return ("Hola "..name);
+		end
+
+		local spanishGreeter = SpanishGreeter:New();
+		local spanishGreeting = spanishGreeter:GetGreeting("Bob");
+		local englishGreeting = spanishGreeter:Super('GetGreeting', "Bob");
+
+		assert.equal(spanishGreeting, "Hola Bob");
+		assert.equal(englishGreeting, "Hello Bob");
+	end)
+
 end)
