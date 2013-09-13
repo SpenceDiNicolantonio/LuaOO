@@ -106,4 +106,17 @@ describe("Extension", function()
 		end)
 	end)
 
+
+	it("should not inherit constructor logic", function()
+		local MyClass = Object:Extend("MyClass");
+		local MySubclass = MyClass:Extend("MySubclass");
+		function MyClass:Construct()
+			self.value = "MyClass value";
+		end
+
+		local myClassInstance = MyClass:New();
+		local mySubclassInstance = MySubclass:New();
+		assert.not_equal(myClassInstance.value, mySubclassInstance.value);
+	end)
+
 end)

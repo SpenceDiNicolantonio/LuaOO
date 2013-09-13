@@ -1,16 +1,39 @@
 
--- FIXME most default methods can be defined in only the base class
 -- FIXME hide metatable
 -- FIXME error checking
 
+
+---================= Constants =================---
+---=============================================---
+
+-- Keywords that are restrcited for one reason
+-- or another and cannot be used for member names
+local RESTRICTED_KEYWORDS = {'static', 'final'};
+
+-- The name of the constructor function
+local CONSTRUCTOR_NAME = "Construct";
+
+
+
+---============== Local Functions ==============---
+---=============================================---
+
+---
+-- An empty function
+--
+local function doNothing() end
 
 ---
 -- Determines whether a given string is a restricted keyword
 -- @param
 --
 local function isRestrictedKeyword(str)
-	return (str == 'static')
-		or (str == 'final');
+	for _, keyword in pairs(RESTRICTED_KEYWORDS) do
+		if (str == keyword) then
+			return true;
+		end
+	end
+	return false;
 end
 
 ---
@@ -23,6 +46,13 @@ local function isClass(class)
 			and class:Extends(Object);
 end;
 
+
+---========== createClass() Function ===========---
+-- This is where the magic happens. The createClass()
+-- function handles the construction of a class
+-- object, including the setting of its metatable
+-- to facilitate inheritence and other OO goodness.
+---=============================================---
 
 ---
 -- Configure's a class' metatable
@@ -67,7 +97,7 @@ local function createClass(name, super)
 	--
 	local function storeMember(key, value, static, final)
 		-- Only allow method definitions for non-static members
-		assert(static or (type(value) == 'function'), "Only methods may be defined non-static");
+		assert(static or (type(value) == 'function') or (value == nil), "Only methods may be defined non-static");
 
 		-- Verify key not a restricted keyword
 		assert(not isRestrictedKeyword(key), string.format("Cannot define method with name '%s', a restricted keyword", key));
@@ -168,23 +198,18 @@ local function createClass(name, super)
 		end,
 
 		--- String representation
-		__tostring = function(self) return name; end
+		__tostring = function(self)
+			return name;
+		end
 	});
 
 
 	---============= Default Methods ===============---
-	--- These methods must be definied per class rather
-	--- than be inherited. This is typically because
-	--- they facility the inheritence, or rely on
-	--- closure variables (up values).
+	-- These methods must be definied per class rather
+	-- than be inherited. This is typically because
+	-- they facility the inheritence, or rely on
+	-- closure variables (up values).
 	---=============================================---
-
-	---
-	-- Default Constructor
-	--
-	function members:Construct()
-		-- Do nothing
-	end
 
 	---
 	-- Returns the object's class
@@ -226,6 +251,13 @@ local function createClass(name, super)
 		elseif (final) then
 			return final, true;
 		end
+
+		-- If we're looking for the Constructor and it wasn't found in the class
+		-- return an empty function so the parent constructor isn't inherited
+		if (methodName == CONSTRUCTOR_NAME) then
+			return doNothing, false;
+		end
+
 
 		-- Method not found in class, so check superclass
 		if (super) then
@@ -301,20 +333,20 @@ local function createClass(name, super)
 	--
 	local depth = 1;
 	function members.final:Super(methodName, ...)
-		-- Determine which constructor to call
+		-- Determine which class to call method on
 		local superTarget = self;
 		for i=1, depth do
 			superTarget = superTarget:Parent();
 		end
 
-		-- Increment depth so if the super-constructor contains
+		-- Increment depth so if the superclass method contains
 		-- a call to self:Super(), we don't get stuck in an infinite loop
 		depth = depth + 1;
 
 		-- Call method
 		local returnValues = {superTarget:FindMethod(methodName)(self, ...)};
 
-		-- Decrement depth now that we're out of the super-constructor
+		-- Decrement depth now that we're out of the superclass call
 		depth = depth - 1;
 
 		-- Return results of method call
@@ -379,7 +411,7 @@ local function createClass(name, super)
 		});
 
 		-- Call constructor
-		instance:Construct(...);
+		instance[CONSTRUCTOR_NAME](instance, ...);
 
 		-- Return instance
 		return instance;
@@ -391,5 +423,8 @@ local function createClass(name, super)
 end
 
 
---- Create Object base class
+---============= Object Base Class =============---
+-- Create global class from which all classes will
+-- extend.
+---=============================================---
 Object = createClass("Object");

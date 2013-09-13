@@ -130,4 +130,9 @@ describe("Class", function()
 		assert.equals(MyClass:SomeStaticFinalMethod(), "static final");
 	end)
 
+	it("should be able to remove methods", function()
+		function MyClass:SomeFunction() return 1; end
+		MyClass.SomeFunction = nil;
+	end)
+
 end)
