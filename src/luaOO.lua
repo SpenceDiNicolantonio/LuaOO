@@ -91,6 +91,8 @@ local function createClass(name, super)
 		end,
 
 		__newindex = function(self, key, value)
+			-- Verify not base class
+			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, false, true);
 		end
 	})
@@ -103,6 +105,8 @@ local function createClass(name, super)
 		end,
 
 		__newindex = function(self, key, value)
+			-- Verify not base class
+			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, true, true);
 		end
 	});
@@ -111,12 +115,14 @@ local function createClass(name, super)
 	local staticHandle = setmetatable({}, {
 
 		__index = function(self, key)
-		-- Only allow access to static final handle
+			-- Only allow access to static final handle
 			assert(key == 'final', "Member access through member definition handles is not permitted");
 			return staticFinalHandle;
 		end,
 
 		__newindex = function(self, key, value)
+			-- Verify not base class
+			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, true, false);
 		end
 	});
@@ -137,11 +143,15 @@ local function createClass(name, super)
 
 		--- Store new members as non-static non-final
 		__newindex = function(self, key, value)
+			-- But disallow for base class
+			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, false, false);
 		end,
 
 		--- Forward MyClass() -> MyClass:New()
-		__call = function(self, ...) return self:New(...); end,
+		__call = function(self, ...)
+			return self:New(...);
+		end,
 
 		--- String representation
 		__tostring = function(self) return name; end
@@ -287,6 +297,8 @@ local function createClass(name, super)
 	-- Creates a new instance of the class
 	--
 	function members.static.final:New(...)
+		-- Verify not base class
+		assert(super ~= nil, "Cannot instantiate the Object class. Extend it!");
 
 		-- Create instance
 		local instance = setmetatable({}, {
