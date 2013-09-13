@@ -101,7 +101,6 @@ describe("Extension", function()
 	it("should not allow overriding of static final methods", function()
 		function Point1D.static:Dimensions() return 1; end
 		function Point2D.static.final:Dimensions() return 2; end
-		function Point3D.static:Dimensions() return 3; end
 		assert.error(function()
 			function Point3D.static:Dimensions() return 3; end
 		end)

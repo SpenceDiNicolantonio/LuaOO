@@ -73,13 +73,27 @@ local function createClass(name, super)
 		assert(not isRestrictedKeyword(key), string.format("Cannot define method with name '%s', a restricted keyword", key));
 
 		-- Verify final method doesn't exist
-		local _, final = class:FindMethod(key);
-		assert(not final, string.format("Cannot override final member '%s'", key));
+		local _, finalMemberExists;
+		if (static) then
+			_, finalMemberExists = class:FindStaticMember(key);
+		else
+			_, finalMemberExists = class:FindMethod(key);
+		end
+		assert(not finalMemberExists, string.format("Cannot override final member '%s'", key));
 
-		-- Store member
-		local table = (static and members.static) or members;
-		table = (final and table.final) or table;
-		table[key] = value;
+		-- Store member (and remove old if necessary)
+		if (static and final) then
+			members.static.final[key] = value;
+			members.static[key] = nil;
+		elseif (static) then
+			members.static[key] = value;
+		elseif (final) then
+			members.final[key] = value;
+			members[key] = nil;
+		else
+			members[key] = value;
+		end
+
 	end
 
 
