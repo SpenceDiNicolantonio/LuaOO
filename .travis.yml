@@ -17,7 +17,7 @@ install:
   - sudo luarocks install luafilesystem
   - sudo luarocks install busted
 
-script: "busted test/specs"
+script: "busted --pattern=Spec test/specs"
 
 notifications:
   recipients:
