@@ -9,6 +9,10 @@ Example
 -------
 Lets define two simple classes to greet people. The first will say hello in English, the second in Spanish.
 ```Lua
+-- Require LuaOO to define the global base class 'Object'
+require("LuaOO");
+
+
 -- Define Greeter class by extending Object
 local Greeter = Object:Extend("Greeter");
 
