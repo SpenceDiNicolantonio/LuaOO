@@ -104,6 +104,20 @@ describe("Extension", function()
 		assert.error(function()
 			function Point3D.static:Dimensions() return 3; end
 		end)
+		assert.error(function()
+			function Point3D.static.final:Dimensions() return 3; end
+		end)
+	end)
+
+
+	it("should not allow overriding of static final values", function()
+		Point1D.static.final.someStaticValue = 13;
+		assert.error(function()
+			Point1D.static.someStaticValue = 6;
+		end)
+		assert.error(function()
+			Point1D.static.final.someStaticValue = 6;
+		end)
 	end)
 
 
