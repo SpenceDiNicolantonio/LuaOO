@@ -5,8 +5,8 @@ LuaOO
 An framework for Java-inspired object oriented programming in Lua.
 
 
-Greeter Example
----------------
+Example
+-------
 Lets define two simple classes to greet people. The first will say hello in English, the second in Spanish.
 ```Lua
 -- Define Greeter class by extending Object
@@ -75,7 +75,8 @@ function MyClass.static.MyStaticMethod()
 end
 
 
-print(MyClass.myStaticValue);
+-- Static members are accessed at the class level
+print(MyClass.myStaticValue); --> 13
 MyClass:MyStaticMethod(); --> 13
 ```
 
@@ -99,9 +100,14 @@ function MyClass.final:MyFinalInstanceMethod()
 end
 
 
+-- Final members are accessed the same as non-final members
 print(MyClass.MY_CONSTANT); --> 13
 MyClass:MyStaticFinalMethod(); --> 13
 
 local instance = MyClass:New();
 instance:MyFinalInstanceMethod(); --> 13
+
+
+-- Attempting to override final members will result in an error
+MyClass.MY_CONSTANT = "new value"; --> ERROR!
 ```
