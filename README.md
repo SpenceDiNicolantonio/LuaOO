@@ -82,7 +82,7 @@ MyClass:MyStaticMethod(); --> 13
 
 Constants / Final Members
 -------------------------
-class members defined as `final` cannot be overridden.
+Class members defined as `final` cannot be overridden.
 ```Lua
 local MyClass = Object:Extend("MyClass");
 
