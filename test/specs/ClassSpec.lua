@@ -130,9 +130,30 @@ describe("Class", function()
 		assert.equals(MyClass:SomeStaticFinalMethod(), "static final");
 	end)
 
+
 	it("should be able to remove methods", function()
 		function MyClass:SomeFunction() return 1; end
+		function MyClass.static.SomeStaticFunction() return 1; end
 		MyClass.SomeFunction = nil;
+		MyClass.static.SomeStaticFunction = nil;
+	end)
+
+
+	it("should not be able to remove final methods", function()
+		function MyClass.final:SomeFinalFunction() return 1; end
+		function MyClass.static.final:SomeStaticFinalFunction() return 1; end
+		assert.error(function()
+			MyClass.SomeFinalFunction = nil;
+		end)
+		assert.error(function()
+			MyClass.final.SomeFinalFunction = nil;
+		end)
+		assert.error(function()
+			MyClass.static.SomeStaticFinalFunction = nil;
+		end)
+		assert.error(function()
+			MyClass.static.final.SomeStaticFinalFunction = nil;
+		end)
 	end)
 
 end)

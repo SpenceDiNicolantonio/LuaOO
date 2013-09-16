@@ -95,6 +95,9 @@ describe("Extension", function()
 		assert.error(function()
 			function Point3D:ToString() return "a 3D point"; end
 		end)
+		assert.error(function()
+			function Point3D.final:ToString() return "a 3D point"; end
+		end)
 	end)
 
 
