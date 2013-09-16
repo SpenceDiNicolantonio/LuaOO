@@ -137,7 +137,7 @@ local function createClass(name, super)
 	local finalHandle = setmetatable({}, {
 
 		__index = function(self, key)
-			assert(false, "Member access through member definition handles is not permitted");
+			error("Member access through member definition handles is not permitted");
 		end,
 
 		__newindex = function(self, key, value)
@@ -151,7 +151,7 @@ local function createClass(name, super)
 	local staticFinalHandle = setmetatable({}, {
 
 		__index = function(self, key)
-			assert(false, "Member access through member definition handles is not permitted");
+			error("Member access through member definition handles is not permitted");
 		end,
 
 		__newindex = function(self, key, value)
