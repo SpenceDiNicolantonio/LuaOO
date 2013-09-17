@@ -35,14 +35,31 @@ end
 
 ---
 -- Determines whether a given value is a class
--- @param class (*) The value in question
--- @return (boolean) true if the given table is a class; false otherwise
+-- @param value (*) The value in question
+-- @return (boolean) true if the given value is a class; false otherwise
 --
-local function isClass(class)
-	return class == Object
-		or class
-			and class.Extends ~= nil
-			and class:Extends(Object);
+local function isClass(value)
+	-- nil?
+	if (value == nil) then
+		return false;
+	end
+
+	-- Base class?
+	if (value == Object) then
+		return true;
+	end
+
+	-- Verify class methods and that it extends Object
+	return type(value) == 'table'
+		and value.GetName ~= nil
+		and value.Parent ~= nil
+		and value.FindMethod ~= nil
+		and value.FindStaticMember ~= nil
+		and value.IsInstance ~= nil
+		and value.Extend ~= nil
+		and value.New ~= nil
+		and value.Extends ~= nil
+		and value:Extends(Object);
 end;
 
 
@@ -356,6 +373,27 @@ local function createClass(name, super)
 
 
 	---
+	-- Determines if the given value is a class
+	-- @param value (*) The value in question
+	-- @return (boolean) true if the given value is a class; false otherwise
+	--
+	function members.static.final:IsClass(value)
+		return isClass(value);
+	end
+
+	---
+	-- Determines whether a given value is an object
+	-- @param value (*) The value in question
+	-- @return (boolean) true if the given value is an object; false otherwise
+	--
+	function members.static.final:IsObject(value)
+		print(Object)
+		print(value)
+		print(Object:IsInstance(value))
+		return (Object and Object:IsInstance(value)) or false;
+	end
+
+	---
 	-- Default ToString
 	-- @return (string) The default string representation of of the instance
 	--
@@ -380,7 +418,7 @@ local function createClass(name, super)
 	-- @return (boolean) true if 'object' is an instance of the class; false otherwise
 	function members.static.final:IsInstance(object)
 		-- Verify input
-		if ((object == nil) or (object.GetClass == nil)) then
+		if ((type(object) ~= 'table') or (object.GetClass == nil)) then
 			return false;
 		end
 

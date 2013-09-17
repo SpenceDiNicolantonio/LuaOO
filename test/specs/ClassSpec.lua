@@ -156,4 +156,26 @@ describe("Class", function()
 		end)
 	end)
 
+
+	it("should be able to determine if a value is a class", function()
+		assert.True(Object:IsClass(Object));
+		assert.True(Object:IsClass(MyClass));
+		assert.False(Object:IsClass(nil));
+		assert.False(Object:IsClass({}));
+		assert.False(Object:IsClass(2));
+		assert.False(Object:IsClass("string"));
+	end)
+
+
+	it("should be able to determine if a value is an object", function()
+		local instance = MyClass:New();
+		assert.False(Object:IsObject(Object));
+		assert.False(Object:IsObject(MyClass));
+		assert.False(Object:IsObject(nil));
+		assert.False(Object:IsObject({}));
+		assert.False(Object:IsObject(2));
+		assert.False(Object:IsObject("string"));
+		assert.True(Object:IsObject(instance));
+	end)
+
 end)
