@@ -9,21 +9,24 @@ describe("Instance", function()
 	before_each(function()
 		MyClass = Object:Extend("MyClass");
 		instance = MyClass:New();
+		instance.publicField = "public field";
 	end)
 
 
-	it("can report its class", function()
+	---========================================---
+	-- Query Methods
+	---========================================---
+
+	it("should be able to report its class", function()
 		assert.equal(instance:GetClass(), MyClass);
 		assert.not_equal(instance:GetClass(), Object);
 	end)
 
-
-	it("provides a string representation of itself", function()
+	it("should be able to generate a string representation of itself", function()
 		assert.is_string(instance.ToString());
 	end)
 
-
-	it("can determine if its an instance of a class", function()
+	it("should be able to determine if its an instance of a class", function()
 		MySubclass = MyClass:Extend("MySubclass");
 		assert.True(instance:InstanceOf(MyClass));
 		assert.True(instance:InstanceOf(Object));
@@ -34,15 +37,18 @@ describe("Instance", function()
 	end)
 
 
-	it("can call public methods", function()
+	---========================================---
+	-- Public Member Access/Invocation
+	---========================================---
+
+	it("should allow invocation of public methods", function()
 		function MyClass:SomeMethod()
 			return "public";
 		end
 		assert.equal(instance:SomeMethod(), "public");
 	end)
 
-
-	it("can call public final methods", function()
+	it("should allow invocation of public final methods", function()
 		function MyClass.final:SomeMethod()
 			return "final";
 		end
@@ -50,7 +56,11 @@ describe("Instance", function()
 	end)
 
 
-	it("cannot call static methods", function()
+	---========================================---
+	-- Static Member Access/Invocation
+	---========================================---
+
+	it("should not allow invocation of static methods", function()
 		function MyClass.static:SomeStaticMethod()
 			return "static";
 		end
@@ -59,8 +69,7 @@ describe("Instance", function()
 		end);
 	end)
 
-
-	it("cannot call static final methods", function()
+	it("should not allow invocation of static final methods", function()
 		function MyClass.static:SomeStaticFinalMethod()
 			return "static final";
 		end
@@ -70,7 +79,11 @@ describe("Instance", function()
 	end)
 
 
-	it("can call superclass methods", function()
+	---========================================---
+	-- Superclass Method Invocation
+	---========================================---
+
+	it("should allow invocation of superclass methods", function()
 		Greeter = Object:Extend("Greeter");
 		function Greeter:GetGreeting(name)
 			return ("Hello "..name);

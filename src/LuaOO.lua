@@ -99,18 +99,6 @@ local function createClass(name, super)
 		}
 	}
 
-	---========= Member Definition Handles =========---
-	-- Member definition handles are provided to allow
-	-- a user to define class members without actually
-	-- being granting access to the underlying member
-	-- storage. These handles have metatables configured
-	-- to forward member definitions to the underlying
-	-- class member storage.
-	-- Usage:  MyClass.static.final.MyMethod() will
-	-- define a static final method 'MyMethod' in the
-	-- class 'MyClass'.
-	---=============================================---
-
 	---
 	-- Validates and store a class member
 	-- @param key (string) The name of the member being stored
@@ -134,21 +122,31 @@ local function createClass(name, super)
 		end
 		assert(not finalMemberExists, string.format("Cannot override final member '%s'", key));
 
-		-- Store member (and remove old if necessary)
-		if (static and final) then
-			members.static.final[key] = value;
-			members.static[key] = nil;
-		elseif (static) then
-			members.static[key] = value;
-		elseif (final) then
-			members.final[key] = value;
-			members[key] = nil;
-		else
-			members[key] = value;
-		end
 
+		-- Remove old member if storing final
+		local t = members;
+		t = (static and t.static) or t;
+		t[key] = nil;
+
+		-- Store new member
+		local t = members;
+		t = (static and t.static) or t;
+		t = (final and t.final) or t;
+		t[key] = value;
 	end
 
+
+	---========= Member Definition Handles =========---
+	-- Member definition handles are provided to allow
+	-- a user to define class members without actually
+	-- being granting access to the underlying member
+	-- storage. These handles have metatables configured
+	-- to forward member definitions to the underlying
+	-- class member storage.
+	-- Usage:  MyClass.static.final.MyMethod() will
+	-- define a static final method 'MyMethod' in the
+	-- class 'MyClass'.
+	---=============================================---
 
 	-- Final handle
 	local finalHandle = setmetatable({}, {
@@ -265,8 +263,12 @@ local function createClass(name, super)
 		-- a call to self:Super(), we don't get stuck in an infinite loop
 		depth = depth + 1;
 
+		-- Find method
+		local method = superTarget:FindMethod(methodName);
+		assert(type(method) == 'function', string.format("Method '%s' not found", methodName));
+
 		-- Call method
-		local returnValues = {superTarget:FindMethod(methodName)(self, ...)};
+		local returnValues = {method(self, ...)};
 
 		-- Decrement depth now that we're out of the superclass call
 		depth = depth - 1;
@@ -387,9 +389,6 @@ local function createClass(name, super)
 	-- @return (boolean) true if the given value is an object; false otherwise
 	--
 	function members.static.final:IsObject(value)
-		print(Object)
-		print(value)
-		print(Object:IsInstance(value))
 		return (Object and Object:IsInstance(value)) or false;
 	end
 

@@ -18,14 +18,13 @@ describe("Extension", function()
 
 		Point2D = Point1D:Extend("Point2D");
 		function Point2D:Construct(x, y)
-			self.x = x;
+			self:Super('Construct', x);
 			self.y = y;
 		end
 
 		Point3D = Point2D:Extend("Point3D");
 		function Point3D:Construct(x, y, z)
-			self.x = x;
-			self.y = y;
+			self:Super('Construct', x, y);
 			self.z = z;
 		end
 
@@ -35,13 +34,16 @@ describe("Extension", function()
 	end)
 
 
+	---========================================---
+	-- Public Member Inheritence
+	---========================================---
+
 	it("should inherit public methods", function()
 		function Point1D:ToString() return "a point" end
 		assert.equals(p1:ToString(), "a point");
 		assert.equals(p2:ToString(), "a point");
 		assert.equals(p3:ToString(), "a point");
 	end)
-
 
 	it ("should inherit public final methods", function()
 		function Point1D.final:ToString() return "a point" end
@@ -51,21 +53,9 @@ describe("Extension", function()
 	end)
 
 
-	it("should inherit static methods", function()
-		function Point1D.static:ToString() return "a point" end
-		assert.equals(Point1D:ToString(), "a point");
-		assert.equals(Point2D:ToString(), "a point");
-		assert.equals(Point3D:ToString(), "a point");
-	end)
-
-
-	it ("should inherit static final methods", function()
-		function Point1D.static.final:ToString() return "a point" end
-		assert.equals(Point1D:ToString(), "a point");
-		assert.equals(Point2D:ToString(), "a point");
-		assert.equals(Point3D:ToString(), "a point");
-	end)
-
+	---========================================---
+	-- Public Member Overriding
+	---========================================---
 
 	it("should allow overriding of public methods", function()
 		function Point1D:ToString() return ("("..self.x..")"); end
@@ -76,18 +66,6 @@ describe("Extension", function()
 		assert.equals(p2:ToString(), "(22, 33)");
 		assert.equals(p3:ToString(), "(44, 55, 66)");
 	end)
-
-
-	it("should allow overriding of static methods", function()
-		function Point1D.static:Dimensions() return 1; end
-		function Point2D.static:Dimensions() return 2; end
-		function Point3D.static:Dimensions() return 3; end
-
-		assert.equals(Point1D:Dimensions(), 1);
-		assert.equals(Point2D:Dimensions(), 2);
-		assert.equals(Point3D:Dimensions(), 3);
-	end)
-
 
 	it("should not allow overriding of public final methods", function()
 		function Point1D:ToString() return "a 1D point"; end
@@ -101,6 +79,49 @@ describe("Extension", function()
 	end)
 
 
+	---========================================---
+	-- Static Member Inheritence
+	---========================================---
+
+	it("should inherit static methods", function()
+		function Point1D.static:ToString() return "a point" end
+		assert.equals(Point1D:ToString(), "a point");
+		assert.equals(Point2D:ToString(), "a point");
+		assert.equals(Point3D:ToString(), "a point");
+	end)
+
+	it ("should inherit static final methods", function()
+		function Point1D.static.final:ToString() return "a point" end
+		assert.equals(Point1D:ToString(), "a point");
+		assert.equals(Point2D:ToString(), "a point");
+		assert.equals(Point3D:ToString(), "a point");
+	end)
+
+
+	---========================================---
+	-- Static Member Overriding
+	---========================================---
+
+	it("should not allow overriding of static final values", function()
+		Point1D.static.final.someStaticValue = 13;
+		assert.error(function()
+			Point1D.static.someStaticValue = 6;
+		end)
+		assert.error(function()
+			Point1D.static.final.someStaticValue = 6;
+		end)
+	end)
+
+	it("should allow overriding of static methods", function()
+		function Point1D.static:Dimensions() return 1; end
+		function Point2D.static:Dimensions() return 2; end
+		function Point3D.static:Dimensions() return 3; end
+
+		assert.equals(Point1D:Dimensions(), 1);
+		assert.equals(Point2D:Dimensions(), 2);
+		assert.equals(Point3D:Dimensions(), 3);
+	end)
+
 	it("should not allow overriding of static final methods", function()
 		function Point1D.static:Dimensions() return 1; end
 		function Point2D.static.final:Dimensions() return 2; end
@@ -113,16 +134,9 @@ describe("Extension", function()
 	end)
 
 
-	it("should not allow overriding of static final values", function()
-		Point1D.static.final.someStaticValue = 13;
-		assert.error(function()
-			Point1D.static.someStaticValue = 6;
-		end)
-		assert.error(function()
-			Point1D.static.final.someStaticValue = 6;
-		end)
-	end)
-
+	---========================================---
+	-- Other Inheritence
+	---========================================---
 
 	it("should not inherit constructor logic", function()
 		local MyClass = Object:Extend("MyClass");

@@ -2,19 +2,22 @@ require("LuaOO")
 
 describe("Base Class", function()
 
-	it("cannot be instantiated", function()
+	---========================================---
+	-- Instantiation / Extension
+	---========================================---
+
+	it("should be instantiable", function()
 		assert.error(function()
 			Object:New();
 		end)
 	end)
 
-	it("can be extended", function()
+	it("should be extendable", function()
 		local MyClass = Object:Extend("MyClass");
 		assert.truthy(MyClass);
 	end)
 
-
-	it("requires a class name for extension", function()
+	it("should require a class name for extension", function()
 		assert.error(function()
 			Object:Extend();
 		end)
@@ -27,17 +30,19 @@ describe("Base Class", function()
 	end)
 
 
-	it("can report its name", function()
+	---========================================---
+	-- Query Methods
+	---========================================---
+
+	it("should be able to report its name", function()
 		assert.equals(Object:GetName(), "Object");
 	end)
 
-
-	it("has no superclass", function()
+	it("should have no superclass", function()
 		assert.Nil(Object:Parent());
 	end)
 
-
-	it("can dertermine if it extends a class", function()
+	it("should be able to dertermine if it extends a class", function()
 		local MyClass = Object:Extend("MyClass");
 		assert.False(Object:Extends(MyClass));
 		assert.False(Object:Extends(Object));
@@ -46,8 +51,7 @@ describe("Base Class", function()
 		end);
 	end)
 
-
-	it("can determine if an object is an instance of it", function()
+	it("should be able to determine if an object is an instance of it", function()
 		local MyClass = Object:Extend("MyClass");
 		local instance = MyClass:New();
 		assert.True(Object:IsInstance(instance));
@@ -55,45 +59,47 @@ describe("Base Class", function()
 	end)
 
 
-	it("does not allow definition of public fields", function()
+	---========================================---
+	-- Finality
+	---========================================---
+
+	it("should not allow definition of public fields", function()
 		assert.error(function()
 			Object.someField = "value";
 		end)
+	end)
+
+	it("should not allow definition of public final fields", function()
 		assert.error(function()
 			Object.final.someField = "value";
 		end)
 	end)
 
-
-	it("does not allow definition of public methods", function()
+	it("should not allow definition of public methods", function()
 		assert.error(function()
 			function Object:SomeMethod() end
 		end)
 	end)
 
-
-	it("does not allow definition of static fields", function()
-		assert.error(function()
-			Object.static.someField = "value";
-		end)
-	end)
-
-
-	it("does not allow definition of static methods", function()
-		assert.error(function()
-			function Object.static:SomeStaticMethod() end
-		end)
-	end)
-
-
-	it("does not allow definition of public final methods", function()
+	it("should not allow definition of public final methods", function()
 		assert.error(function()
 			function Object.final:SomeFinalMethod() end
 		end)
 	end)
 
+	it("should not allow definition of static fields", function()
+		assert.error(function()
+			Object.static.someField = "value";
+		end)
+	end)
 
-	it("does not allow definition of static final methods", function()
+	it("should not allow definition of static methods", function()
+		assert.error(function()
+			function Object.static:SomeStaticMethod() end
+		end)
+	end)
+
+	it("should not allow definition of static final methods", function()
 		assert.error(function()
 			function Object.static.final:SomeStaticFinalMethod() end
 		end)
