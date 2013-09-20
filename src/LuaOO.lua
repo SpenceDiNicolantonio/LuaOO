@@ -16,14 +16,12 @@ local CONSTRUCTOR_NAME = "Construct";
 
 ---
 -- An empty function
---
 local function doNothing() end
 
 ---
 -- Determines whether a given string is a restricted keyword
 -- @param str (string) The string in question
 -- @return (boolean) true if the given string is a restricted keyword; false otherwise
---
 local function isRestrictedKeyword(str)
 	for _, keyword in pairs(RESTRICTED_KEYWORDS) do
 		if (str == keyword) then
@@ -37,7 +35,6 @@ end
 -- Determines whether a given value is a class
 -- @param value (*) The value in question
 -- @return (boolean) true if the given value is a class; false otherwise
---
 local function isClass(value)
 	-- nil?
 	if (value == nil) then
@@ -75,7 +72,6 @@ end;
 -- @param name (string) The name of the class
 -- @param super (class)The superclass
 -- @return (class) a class
---
 local function createClass(name, super)
 
 	-- Verify name
@@ -105,7 +101,6 @@ local function createClass(name, super)
 	-- @param value (*) The value or function being stored
 	-- @param static (boolean) true for static member; false otherwise
 	-- @param final (boolean) true for final member; false otherwise
-	--
 	local function storeMember(key, value, static, final)
 		-- Only allow method definitions for non-static members
 		assert(static or (type(value) == 'function') or (value == nil), "Only methods may be defined non-static");
@@ -235,7 +230,6 @@ local function createClass(name, super)
 	---
 	-- Returns the object's class
 	-- @return (class) The object's class
-	--
 	function members.final:GetClass()
 		return class;
 	end
@@ -250,7 +244,6 @@ local function createClass(name, super)
 	-- @param methodName (string) The name of the method to call
 	-- @param ... (*) Arguments to be passed to the superclass method
 	-- return (*) Values returned by superclass method called
-	--
 	local depth = 1;
 	function members.final:Super(methodName, ...)
 		-- Determine which class to call method on
@@ -280,7 +273,6 @@ local function createClass(name, super)
 	---
 	-- Returns the class' name
 	-- @return (string) class' name
-	--
 	function members.static.final:GetName()
 		return name;
 	end
@@ -288,7 +280,6 @@ local function createClass(name, super)
 	---
 	-- Returns the class' superclass
 	-- @return (class) class' parent class
-	--
 	function members.static.final:Parent()
 		return super;
 	end
@@ -299,7 +290,6 @@ local function createClass(name, super)
 	-- @param methodName (string) Name of the instance method to search for
 	-- @return (function, boolean) The instance method and whether the method
 	-- is final; nil if no method was found
-	--
 	function members.static.final:FindMethod(methodName)
 		-- Don't bother looking for restricted keywords
 		if (isRestrictedKeyword(methodName)) then
@@ -337,7 +327,6 @@ local function createClass(name, super)
 	-- @param memberName (string) The name of the class member to search for
 	-- @return (*, boolean) The value/function and whether it is final; nil if
 	-- the member wasn't found
-	--
 	function members.static.final:FindStaticMember(memberName)
 		-- Don't bother looking for restricted keywords
 		if (isRestrictedKeyword(memberName)) then
@@ -378,7 +367,6 @@ local function createClass(name, super)
 	-- Determines if the given value is a class
 	-- @param value (*) The value in question
 	-- @return (boolean) true if the given value is a class; false otherwise
-	--
 	function members.static.final:IsClass(value)
 		return isClass(value);
 	end
@@ -387,7 +375,6 @@ local function createClass(name, super)
 	-- Determines whether a given value is an object
 	-- @param value (*) The value in question
 	-- @return (boolean) true if the given value is an object; false otherwise
-	--
 	function members.static.final:IsObject(value)
 		return (Object and Object:IsInstance(value)) or false;
 	end
@@ -395,7 +382,6 @@ local function createClass(name, super)
 	---
 	-- Default ToString
 	-- @return (string) The default string representation of of the instance
-	--
 	function members:ToString()
 		return tostring(self);
 	end
@@ -405,7 +391,6 @@ local function createClass(name, super)
 	-- @param class (class) The class in question
 	-- @return (boolean) true if the object is an instance of the given class;
 	-- false otherwise
-	--
 	function members.final:InstanceOf(class)
 		assert(isClass(class), "Invalid class. Expected class object.");
 		return class:IsInstance(self);
@@ -429,7 +414,6 @@ local function createClass(name, super)
 	-- Creates a subclass of the class
 	-- @param name (string) subclass name
 	-- @return (class) The subclass
-	--
 	function members.static.final:Extend(name)
 		return createClass(name, self);
 	end
@@ -439,7 +423,6 @@ local function createClass(name, super)
 	-- class or is a superclass of this class
 	-- @param class (class) The class in question
 	-- @return (boolean) true if the class extends the given class; false otherwise
-	--
 	function members.static.final:Extends(class)
 		assert(class ~= nil, "Expected class, found nil.");
 
@@ -451,7 +434,6 @@ local function createClass(name, super)
 	-- Creates a new instance of the class
 	-- @param ... (*) Arguments to be passed to the class constructor
 	-- @return (object) The new class instance
-	--
 	function members.static.final:New(...)
 		local class = self;
 
