@@ -38,6 +38,23 @@ describe("Instance", function()
 
 
 	---========================================---
+	-- Public Member Definition
+	---========================================---
+
+	it("should allow definition of public methods", function()
+		function instance:SomeMethod()
+			return "public";
+		end
+		assert.equal(instance:SomeMethod(), "public");
+	end)
+
+	it("should allow definition of public fields", function()
+		instance.someField = "field"
+		assert.equal(instance.someField, "field");
+	end)
+
+
+	---========================================---
 	-- Public Member Access/Invocation
 	---========================================---
 
