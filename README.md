@@ -113,3 +113,40 @@ instance:MyFinalInstanceMethod(); --> 13
 -- Attempting to override final members will result in an error
 MyClass.MY_CONSTANT = "new value"; --> ERROR!
 ```
+
+Immutable Object references
+---------------------------
+One of the goals of LuaOO is to preserve as much of the default functionality in the Lua language as possible. 
+For this reason, all fields are public members and can be mutated directly:
+```Lua
+local MyClass = Object:Extend("MyClass");
+
+function MyClass:Construct()
+  self.value = "some value";
+end
+
+local instance = MyClass:New();
+
+-- Fields are public and accessable directly
+instance.value = "some other value";
+```
+In certain cases, it may be desirable to make an instance immutable. This can be acomplished using the `ReadOnly()`
+method, which is defined in the `Object` base class. This method will return an immutable wrapper to the instance on 
+which the method was called. This feature is especially convenient for defining class constants:
+```Lua
+local Color = Object:Extend("Color");
+
+function Color:Construct(r, g, b)
+  self.r = r;
+  self.g = g;
+  self.b = b;
+end
+
+Color.static.final.BLACK = Color:New(0, 0, 0):ReadOnly();
+Color.static.final.WHITE = Color:New(255, 255, 255):ReadOnly();
+Color.static.final.MAGENTA = Color:New(255, 0, 255):ReadOnly();
+...
+
+-- Attempting to mutate a read-only reference will result in an error
+Color.static.final.MAGENTA.r = 0; --> ERROR!
+```
