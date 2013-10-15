@@ -2,8 +2,8 @@
 ---================= Constants =================---
 ---=============================================---
 
--- Keywords that are restrcited for one reason
--- or another and cannot be used for member names
+-- Keywords that are restricted for one reason
+-- or another and cannot be used for class member names
 local RESTRICTED_KEYWORDS = {'static', 'final'};
 
 -- The name of the constructor function
@@ -384,6 +384,19 @@ local function createClass(name, super)
 	-- @return (string) The default string representation of of the instance
 	function members:ToString()
 		return tostring(self);
+	end
+
+	---
+	-- Returns a read-only wrapper of the instance
+	-- @return (Object) The read-only reference
+	function members.final:ReadOnly()
+		return setmetatable({}, {
+			__index = self,
+			__newindex = function(table, key, value)
+				error("Attempt to modify read-only table")
+			end,
+			__metatable = false
+		});
 	end
 
 	---
