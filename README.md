@@ -114,6 +114,59 @@ instance:MyFinalInstanceMethod(); --> 13
 MyClass.MY_CONSTANT = "new value"; --> ERROR!
 ```
 
+Properties
+----------
+Class properties can be declared on a class via the `InitProperty()` method. Properties will automatically be
+accessed/mutated through getter/setter methods, if defined. If an appropriate getter/setter is not defined, the
+property will simply be accessed directly.
+
+The naming convention for property getter and setter methods is `Get<PropertyName>` and `Set<PropertyName>`,
+respectively, where the first character of the property name is capitalized. For example, a property named `value`
+would use accessor `GetValue()` and mutator `SetValue()`.
+
+```Lua
+local Point = Object:Extend("Point");
+
+-- Declare properties
+Point:InitProperty("x");
+Point:InitProperty("y");
+
+function Point:GetX()
+  return self.x;
+end
+
+function Point:SetX(value)
+  self.x = value;
+end
+
+-- Notice getter/setter methods haven't been defined for property 'y'
+
+
+-- Properties allow us utilize getter/setter methods implicitely 
+local myPoint = Point:New();
+myPoint.x;       -- Invokes myPoint:GetX()
+myPoint.y;       -- Accesses myPoint.y directly, because Point:GetY() is undefined
+myPoint.x = 5;   -- Invokes myPoint:SetX(5)
+myPoint.y = 10;  -- Mutates myPoint.y directly, because Point:SetY() is undefined
+```
+
+While property getter/setter methods can be defined explicitely, independent of the property's initialization,
+they can also be passed as arguments to the `InitProperty()` method for convenience. The `x` property in the previous
+example could have been defined as follows:
+
+
+```Lua
+Point:InitProperty("x",
+  function(self)
+    return self.x;
+  end,
+  function(self, value)
+    self.x = value;
+  end
+);
+```
+
+
 Immutable Object references
 ---------------------------
 One of the goals of LuaOO is to preserve as much of the default functionality in the Lua language as possible. 
