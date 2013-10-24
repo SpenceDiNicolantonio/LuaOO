@@ -2,9 +2,22 @@ LuaOO [![Build Status](https://travis-ci.org/Pezzer13/LuaOO.png?branch=master)](
 =====
 A framework for Java-inspired object oriented programming in Lua.
 
+Features
+-----------
+- Inheritence (single inheritence through extension)
+- Constructors
+- Properties
+- Static class members
+- Final class members
+- Method overriding
+- Invocation of superclass methods (including constructors)
+- Immutable Object References
+- `GetClass()`
+- `InstanceOf()`
+- `Parent()`
 
-Example
--------
+Usage
+-----
 Lets define two simple classes to greet people. The first will say hello in English, the second in Spanish.
 ```Lua
 -- Require LuaOO to define the global base class 'Object'
