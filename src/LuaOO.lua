@@ -84,6 +84,16 @@ local function createClass(name, super)
 	local class = {};
 
 
+	---============ Properties Storage =============---
+	-- All property names are stored here. Any time
+	-- a field is accessed or mutated, this list will
+	-- be checked. If the field's name is found in this
+	-- list, then property methods (GetX/SetX) will be
+	-- used, if they exist.
+	---=============================================---
+	local properties = {};
+
+
 	---=========== Class Member Storage ============---
 	-- Storing class members here allows us to completely
 	-- hide them from the user and prevent unwanted behavior.
@@ -102,6 +112,9 @@ local function createClass(name, super)
 	-- @param static (boolean) true for static member; false otherwise
 	-- @param final (boolean) true for final member; false otherwise
 	local function storeMember(key, value, static, final)
+		-- Verify not base class
+		assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
+
 		-- Only allow method definitions for non-static members
 		assert(static or (type(value) == 'function') or (value == nil), "Only methods may be defined non-static");
 
@@ -151,10 +164,10 @@ local function createClass(name, super)
 		end,
 
 		__newindex = function(self, key, value)
-			-- Verify not base class
-			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, false, true);
-		end
+		end,
+
+		__metatable = false
 	})
 
 	-- Static final handle
@@ -165,10 +178,10 @@ local function createClass(name, super)
 		end,
 
 		__newindex = function(self, key, value)
-			-- Verify not base class
-			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, true, true);
-		end
+		end,
+
+		__metatable = false
 	});
 
 	-- Static handle
@@ -181,10 +194,10 @@ local function createClass(name, super)
 		end,
 
 		__newindex = function(self, key, value)
-			-- Verify not base class
-			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, true, false);
-		end
+		end,
+
+		__metatable = false
 	});
 
 
@@ -203,8 +216,6 @@ local function createClass(name, super)
 
 		--- Store new members as non-static non-final
 		__newindex = function(self, key, value)
-			-- But disallow for base class
-			assert(super ~= nil, "Cannot mutate the Object class. Extend it!");
 			storeMember(key, value, false, false);
 		end,
 
@@ -216,7 +227,10 @@ local function createClass(name, super)
 		--- String representation
 		__tostring = function(self)
 			return name;
-		end
+		end,
+
+		--- Don't allow access to metatable
+		__metatable = false
 	});
 
 
@@ -444,6 +458,47 @@ local function createClass(name, super)
 	end
 
 	---
+	-- Initializes a property. Properties will be accessed via getter/setter
+	-- methods if defined; otherwise, they will be accessed/mutated directly.
+	-- The naming convention for a property getter/setter is Get<PropertyName>
+	-- and Set<PropertyName>, respectively, with the first character of the
+	-- property name capitalized. For example, the propert 'value' would use
+	-- accessor 'GetValue()' and mutator 'SetValue(). The getter/setter methods
+	-- can be defined independently of the property's initialization, or can
+	-- be passed as arguments to be defined implicitely.
+	-- @param propertyName (string) The name of the property
+	-- @param getter (function) Property accessor function. If nil, no getter will
+	-- be defined.
+	-- @param setter (function) Property mutator function. If nil, no setter will
+	-- be defined.
+	function members.static.final:InitProperty(propertyName, getter, setter)
+		-- Validate input
+		assert(type(propertyName) == 'string', "Invalid property name. Expected string, found " .. type(propertyName));
+		assert((getter == nil) or (type(getter) == 'function'), "Invalid getter function. Expected nil or function, found " .. type(propertyName));
+		assert((setter == nil) or (type(setter) == 'function'), "Invalid setter function. Expected nil or function, found " .. type(propertyName));
+
+		-- Determine getter/setter name
+		local UppercasePropertyName = propertyName:gsub("^%l", string.upper);
+		local getterName = "Get" .. UppercasePropertyName;
+		local setterName = "Set" .. UppercasePropertyName;
+
+		-- Store/define property info/methods
+		properties[propertyName] = {
+			getterName = getterName,
+			setterName = setterName
+		};
+
+		-- Set getter/setter, if provided
+		if (getter) then
+			self[getterName] = getter;
+		end
+		if (setter) then
+			self[setterName] = setter;
+		end
+
+	end
+
+	---
 	-- Creates a new instance of the class
 	-- @param ... (*) Arguments to be passed to the class constructor
 	-- @return (object) The new class instance
@@ -467,14 +522,52 @@ local function createClass(name, super)
 				local _, staticFinal = class:FindStaticMember(key);
 				assert(not final and not staticFinal, string.format("Cannot override final member '%s'", key));
 				rawset(self, key, value);
-			end
+			end,
+
+			-- Don't allow access to metatable
+			__metatable = false
+
 		});
+
+		-- Create instance handle
+		local instanceHandle = setmetatable({}, {
+
+			__index = function(self, key)
+
+				-- If property, use property method
+				if (properties[key]) then
+					local getter = class:FindMethod(properties[key].getterName);
+					if (getter) then
+						return getter(self);
+					end
+				end
+
+				-- Forward to instance
+				return instance[key];
+			end,
+
+			__newindex = function(self, key, value)
+
+				-- If property, use property method
+				if (properties[key]) then
+					local setter = class:FindMethod(properties[key].setterName);
+					if (setter) then
+						return setter(self, value);
+					end
+				end
+
+				-- Forward to instance
+				instance[key] = value;
+			end,
+
+			__metatable = false
+		})
 
 		-- Call constructor
 		instance[CONSTRUCTOR_NAME](instance, ...);
 
-		-- Return instance
-		return instance;
+		-- Return instance handle
+		return instanceHandle;
 	end
 
 
