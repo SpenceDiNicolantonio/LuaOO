@@ -39,7 +39,7 @@ describe("Base Class", function()
 	end)
 
 	it("should have no superclass", function()
-		assert.Nil(Object:Parent());
+		assert.equals(Object:Parent(), nil);
 	end)
 
 	it("should be able to dertermine if it extends a class", function()
