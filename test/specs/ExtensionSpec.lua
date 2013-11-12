@@ -135,10 +135,10 @@ describe("Extension", function()
 
 
 	---========================================---
-	-- Other Inheritence
+	-- Constructor Inheritence
 	---========================================---
 
-	it("should not inherit constructor logic", function()
+	it("should inherit constructor logic", function()
 		local MyClass = Object:Extend("MyClass");
 		local MySubclass = MyClass:Extend("MySubclass");
 		function MyClass:Construct()
@@ -147,7 +147,7 @@ describe("Extension", function()
 
 		local myClassInstance = MyClass:New();
 		local mySubclassInstance = MySubclass:New();
-		assert.not_equal(myClassInstance.value, mySubclassInstance.value);
+		assert.equal(myClassInstance.value, mySubclassInstance.value);
 	end)
 
 end)

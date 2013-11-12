@@ -319,12 +319,6 @@ local function createClass(name, super)
 			return final, true;
 		end
 
-		-- If we're looking for the Constructor and it wasn't found in the class
-		-- return an empty function so the parent constructor isn't inherited
-		if (methodName == CONSTRUCTOR_NAME) then
-			return doNothing, false;
-		end
-
 
 		-- Method not found in class, so check superclass
 		if (super) then
@@ -564,7 +558,10 @@ local function createClass(name, super)
 		})
 
 		-- Call constructor
-		instance[CONSTRUCTOR_NAME](instance, ...);
+		local constructor = instance[CONSTRUCTOR_NAME];
+		if (constructor) then
+			constructor(instance, ...);
+		end
 
 		-- Return instance handle
 		return instanceHandle;
