@@ -85,7 +85,7 @@ local MyClass = Object:Extend("MyClass");
 MyClass.static.myStaticValue = 13;
 
 -- Static method
-function MyClass.static.MyStaticMethod()
+function MyClass.static:MyStaticMethod()
   print(MyClass.myStaticValue)
 end
 
