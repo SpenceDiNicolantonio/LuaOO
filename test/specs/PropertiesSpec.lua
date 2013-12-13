@@ -29,6 +29,15 @@ describe("Properties", function()
 			end
 		);
 
+		Point:InitProperty("sameName",
+			function(self)
+				return self.sameName;
+			end,
+			function(self, value)
+				self.sameName = value;
+			end
+		);
+
 		instance = Point:New();
 	end)
 
@@ -52,6 +61,11 @@ describe("Properties", function()
 		instance.y = 10
 		assert.equal(instance.realX, 5);
 		assert.equal(instance.realY, 10);
+	end)
+
+	it("should work with properties that match the name of the underlying field", function()
+		instance.sameName = 5
+		assert.equal(instance.sameName, 5);
 	end)
 
 end)

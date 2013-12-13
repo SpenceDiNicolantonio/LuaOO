@@ -532,7 +532,7 @@ local function createClass(name, super)
 				if (properties[key]) then
 					local getter = class:FindMethod(properties[key].getterName);
 					if (getter) then
-						return getter(self);
+						return getter(instance);
 					end
 				end
 
@@ -546,7 +546,7 @@ local function createClass(name, super)
 				if (properties[key]) then
 					local setter = class:FindMethod(properties[key].setterName);
 					if (setter) then
-						return setter(self, value);
+						return setter(instance, value);
 					end
 				end
 
