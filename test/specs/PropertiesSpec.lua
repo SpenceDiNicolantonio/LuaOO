@@ -38,6 +38,8 @@ describe("Properties", function()
 			end
 		);
 
+		Point:InitFinalProperty("finalProperty");
+
 		instance = Point:New();
 	end)
 
@@ -66,6 +68,13 @@ describe("Properties", function()
 	it("should work with properties that match the name of the underlying field", function()
 		instance.sameName = 5
 		assert.equal(instance.sameName, 5);
+	end)
+
+	it("should not allow overwriting of final properties", function()
+		instance.finalProperty = 5;
+		assert.error(function()
+			instance.finalProperty = 10;
+		end)
 	end)
 
 end)

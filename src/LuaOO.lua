@@ -493,6 +493,19 @@ local function createClass(name, super)
 	end
 
 	---
+	-- Initializes a final property, a property which cannot be overwritten
+	-- once an initial value has been assigned.
+	-- @param propertyName (string) The name of the property
+	-- @param getter (function) Property accessor function. If nil, no getter will
+	-- be defined.
+	function members.static.final:InitFinalProperty(propertyName, getter)
+		self:InitProperty(propertyName, getter, function(self, value)
+			assert(self[propertyName] == nil, "Cannot overwrite final property: "..propertyName);
+			self[propertyName] = value;
+		end)
+	end
+
+	---
 	-- Creates a new instance of the class
 	-- @param ... (*) Arguments to be passed to the class constructor
 	-- @return (object) The new class instance
